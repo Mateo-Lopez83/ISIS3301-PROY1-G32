@@ -5,5 +5,5 @@ path = 'data/fake_news_spanish_limpio.csv'
 
 pipeline = FakeNewsPipeline(path)
 pipeline.train()
-pipeline.save_model("prueba_modelo.joblib")
+pipeline.save_model("/api/models/fakenews.joblib")
 print('joblib creado cheveremenente')
