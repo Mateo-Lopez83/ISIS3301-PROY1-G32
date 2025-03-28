@@ -22,3 +22,9 @@ cd api
 
 uvicorn main:app --reload
 ```
+
+## Frontend
+
+Esta API es consumida por el front, diseñado para interactuar con cada uno de los endpoints expuestos y ofrecer al usuario una buena experiencia verificando la veracidad de sus noticias
+
+[Frontend Repo](https://github.com/ignchap27/ISIS3301-PROY1-G32-FRONT.git)
