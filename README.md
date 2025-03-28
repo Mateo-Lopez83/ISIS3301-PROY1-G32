@@ -4,7 +4,12 @@ Para iniciar este API se deben correr los siguentes comandos, para crear el ambi
 
 ```
 python -m venv venv
+
 . venv/Scripts/activate
-pip install -r requirements.txt
+
+pip install -r 'requirements.txt'
+
+cd api
+
 uvicorn main:app --reload
 ```
