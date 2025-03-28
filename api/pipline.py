@@ -116,6 +116,12 @@ class FakeNewsPipeline:
         data = classification_report(self.y_test, y_pred, output_dict=True) 
         return data
     
+    def retrain(self, new_data: pd.DataFrame):
+        self.df = pd.concat([self.df, new_data], ignore_index=True)
+        self._split_data()
+        self.train()
+        self.save_model("models/fakenews.joblib")
+    
     def predict(self, X):
         return self.pipeline.predict(X)
     
