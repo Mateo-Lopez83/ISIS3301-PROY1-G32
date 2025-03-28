@@ -1,7 +1,8 @@
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from DataModel import DataModel
 from joblib import load
+from io import StringIO
 
 app = FastAPI()
 model_pipeline = load("models/fakenews.joblib")
@@ -29,9 +30,25 @@ def make_predictions(dataModel: DataModel):
 def get_analytics():
     try:
         metrics = model_pipeline.check()
-        return {"metrics": metrics}
+        return {"metricas": metrics}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@app.post("/retrain")
+async def retrain_model(file: UploadFile = File(...)):
+    global model_pipeline
+    try:
+        content = await file.read()
+        new_data = pd.read_csv(StringIO(content.decode("utf-8")))
+        if not all(col in new_data.columns for col in ["ID","Label","Titulo","Descripcion","Fecha"]):
+            raise HTTPException(status_code=400, detail="Error en el formato del csv nuevo")
+        model_pipeline.retrain(new_data)
+        model_pipeline = load("models/fakenews.joblib")
+        metrics = model_pipeline.check()
+        return {"message": "Model retrained successfully",
+                "metricas": metrics}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # probamos el API
