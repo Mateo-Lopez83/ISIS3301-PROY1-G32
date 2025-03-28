@@ -100,7 +100,7 @@ class FakeNewsPipeline:
 
         self.pipeline = Pipeline([
             ('preprocessing', preprocessor),
-            ('classifier', RandomForestClassifier(n_estimators=100, random_state=42))
+            ('classifier', RandomForestClassifier(n_estimators=70, random_state=42))
         ])
     
     def train(self):
@@ -108,10 +108,16 @@ class FakeNewsPipeline:
     
     def evaluate(self):
         y_pred = self.pipeline.predict(self.X_test)
-        print(classification_report(self.y_test, y_pred))
+        data = (classification_report(self.y_test, y_pred))
+        return data
+    
+    def check(self):
+        y_pred = self.pipeline.predict(self.X_test)
+        data = classification_report(self.y_test, y_pred)
+        return data
     
     def predict(self, X):
         return self.pipeline.predict(X)
     
     def save_model(self, filename):
-        joblib.dump(self.pipeline, filename)
+        joblib.dump(self, filename)

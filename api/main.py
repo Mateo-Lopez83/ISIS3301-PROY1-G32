@@ -28,7 +28,7 @@ def make_predictions(dataModel: DataModel):
 @app.get("/analytics")
 def get_analytics():
     try:
-        metrics = model_pipeline.evaluate()
+        metrics = model_pipeline.check()
         return {"metrics": metrics}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
