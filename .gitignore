@@ -1,3 +1,4 @@
 api/__pycache__/
 __pycache__/
 venv/
+api/models/fakenews.joblib
