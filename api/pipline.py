@@ -113,7 +113,7 @@ class FakeNewsPipeline:
     
     def check(self):
         y_pred = self.pipeline.predict(self.X_test)
-        data = classification_report(self.y_test, y_pred)
+        data = classification_report(self.y_test, y_pred, output_dict=True) 
         return data
     
     def predict(self, X):
