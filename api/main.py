@@ -10,6 +10,7 @@ model_pipeline = load("models/fakenews.joblib")
 def read_root():
     return {"message":"hola"}
 
+
 @app.post("/predict")
 def make_predictions(dataModel: DataModel):
     try:
