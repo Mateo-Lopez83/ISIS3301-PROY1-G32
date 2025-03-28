@@ -34,6 +34,32 @@ def get_analytics():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@app.post("/batchpredict")
+async def batch_predict(file: UploadFile = File(...)):
+    try:
+        content = await file.read()
+        new_data = pd.read_csv(StringIO(content.decode("utf-8")))
+        required_columns = ["ID", "Titulo", "Descripcion", "Fecha"]
+        if not all(col in new_data.columns for col in required_columns):
+            raise HTTPException(status_code=400, detail="Error en el formato del CSV nuevo")
+        df_for_prediction = new_data[["Titulo", "Descripcion"]]
+        predictions = model_pipeline.predict(df_for_prediction)
+        results = []
+        for idx, pred in enumerate(predictions):
+            results.append({
+                "ID": new_data.iloc[idx]["ID"],
+                "Titulo": new_data.iloc[idx]["Titulo"],
+                "Descripcion": new_data.iloc[idx]["Descripcion"],
+                "Fecha": new_data.iloc[idx]["Fecha"],
+                "Prediction": pred
+            })
+
+        return {"predictions": results}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/retrain")
 async def retrain_model(file: UploadFile = File(...)):
     global model_pipeline
