@@ -1,9 +1,10 @@
 # Iniciar el API
 
-Para iniciar este API se deben correr los siguentes comandos, para activar el ambiente virtual y generar el archivo joblib que persiste nuestro modelo de fakenews
+Para iniciar este API se deben correr los siguentes comandos, para crear el ambiente virtual e instalar las librerias necesarias 
 
 ```
+python -m venv venv
 . venv/Scripts/activate
-cd api
+pip install -r requirements.txt
 uvicorn main:app --reload
 ```
