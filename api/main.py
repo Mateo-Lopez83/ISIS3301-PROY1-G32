@@ -3,9 +3,18 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from DataModel import DataModel
 from joblib import load
 from io import StringIO
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 model_pipeline = load("models/fakenews.joblib")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
@@ -14,15 +23,48 @@ def read_root():
 @app.post("/predict")
 def make_predictions(dataModel: DataModel):
     try:
-        print("im here")
         df_data = pd.DataFrame([dataModel.dict()])
         df_columns = df_data.columns
 
-        #model = load("prueba_modelo.joblib")
-        result = model_pipeline.predict(df_data[df_columns])         
-        result_list = result.tolist() if hasattr(result, 'tolist') else result # se convierte a lista si es necesario
-        return {"prediction": result_list}
-    
+        labels = model_pipeline.pipeline.predict(df_data[df_columns])
+        probas = model_pipeline.pipeline.predict_proba(df_data[df_columns])
+
+        results = []
+        for label, proba in zip(labels, probas):
+            max_prob = max(proba)  
+            results.append({
+                "label": int(label),
+                "probability": float(max_prob)
+            })
+
+        return {"results": results}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/predict_csv")
+async def predict_from_csv(file: UploadFile = File(...)):
+    try:
+        content = await file.read()
+        df = pd.read_csv(StringIO(content.decode("utf-8")), sep=";")
+        if not all(col in df.columns for col in ["Titulo", "Descripcion"]):
+            raise HTTPException(status_code=400, detail="Error en el formato del csv")
+
+        df_data = df[["Titulo", "Descripcion"]]
+        labels = model_pipeline.pipeline.predict(df_data)
+        probas = model_pipeline.pipeline.predict_proba(df_data)
+
+        predictions = []
+        for label, proba in zip(labels, probas):
+            max_prob = max(proba)
+            predictions.append({
+                "label": int(label),
+                "probability": float(max_prob)
+            })
+
+        return {"predictions": predictions}
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

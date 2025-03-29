@@ -117,7 +117,7 @@ class FakeNewsPipeline:
         return data
     
     def retrain(self, new_data: pd.DataFrame):
-        self.df = pd.concat([self.df, new_data], ignore_index=True)
+        self.df = pd.concat([self.df, new_data], ignore_index=True).drop_duplicates()
         self._split_data()
         self.train()
         self.save_model("models/fakenews.joblib")
@@ -127,3 +127,10 @@ class FakeNewsPipeline:
     
     def save_model(self, filename):
         joblib.dump(self, filename)
+
+    def predict_with_proba(self, X):
+        pred = self.pipeline.predict(X)
+        probas = self.pipeline.predict_proba(X)
+        max_probas = probas.max(axis=1)  # Tomamos la probabilidad de la clase predicha
+        return list(zip(pred, max_probas))
+

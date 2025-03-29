@@ -1,5 +1,9 @@
-api/__pycache__/
+# Ignorar carpetas __pycache__ en cualquier parte del proyecto
 __pycache__/
-venv/
-api/models/fakenews.joblib
-api/models/*.joblib
+**/__pycache__/
+
+# Ignorar carpeta específica
+venv_noborrar/
+
+# Ignorar archivo específico
+api/models/fakenews_noborrar.joblib
